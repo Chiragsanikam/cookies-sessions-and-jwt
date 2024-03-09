@@ -15,11 +15,14 @@ app.use(bodyParser.json())
 
 
 
- let todos=readFromFile()
+ let todos= readFromFile();
+
+
 
  function readFromFile(){
-    try{    fs.readFileSync('db.json', 'utf8', )
-    return JSON.parse(data)||[]
+    try{ 
+    const data = fs.readFileSync('db.json', 'utf8', )
+    return JSON.parse(data)||[];
     }
     catch(err){
     return []
@@ -27,15 +30,8 @@ app.use(bodyParser.json())
 
  }
 
-
-function pushDetails(data){
-    fs.writeFile('db.json', JSON.stringify(data), (data,err)=>{
-        if(err){
-            console.log('err')
-        }else{
-            console.log("file written")
-        }
-    })
+function pushDetails(){
+    fs.writeFileSync('db.json', JSON.stringify(todos))
 }
 
 
@@ -46,13 +42,33 @@ app.post('/signup', (req, res) => {
             pass: req.body.pass
         }
         todos.push(details)
-        pushDetails(todos)
+        pushDetails()
 
         res.json(todos)
         })
+
+app.post('/login', (req, res) => {
+            const details={
+                name: req.body.name,
+                pass: req.body.pass
+            }
+           let condition=false;
+                for(i=0;i<todos.length;i++){
+                    if(details.name==todos[i].name && details.pass==todos[i].pass){
+                        res.json({message:"login succesfully"})
+                        condition=true
+                        break;
+                    }
+                    
+                }
+                if(!condition){
+                    res.json({message:"login unsuccessful"})
+                    return;
+                 }
+            })
         
 
-  
+
   
   app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
